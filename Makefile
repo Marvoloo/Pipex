@@ -31,10 +31,10 @@ LOBJS = $(LSRCS:%.c=%.o)
 
 all: $(NAME)
 
-bonus: $(BNAME)
+bonus: fclean $(BNAME)
 
 $(NAME): $(LIB) $(OBJS) $(HEADERS)
-	cc $(OBJS) $(LIB) -o $(NAME)
+	cc -Wall -Wextra -Werror $(OBJS) $(LIB) -o $(NAME)
 
 $(BNAME): $(LIB) $(BOBJS) $(HEADERS)
 	cc -Wall -Wextra -Werror $(BOBJS) $(LIB) -o $(BNAME)
@@ -43,7 +43,7 @@ $(LIB): $(LOBJS) libft/libft.h
 	make -C $(LIBPATH)
 
 %.o: %.c
-	cc -c $< -o $@
+	cc -Wall -Wextra -Werror -c $< -o $@
 
 clean:
 	rm -rf $(OBJS)

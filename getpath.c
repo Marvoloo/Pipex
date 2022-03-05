@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   getpath.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fdonetta <fdonetta@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/05 19:29:42 by fdonetta          #+#    #+#             */
+/*   Updated: 2022/03/05 20:19:38 by fdonetta         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 char	*ft_getcpath(char *cmd)
@@ -7,18 +19,20 @@ char	*ft_getcpath(char *cmd)
 	path = ft_strdup(cmd);
 	if (access(path, F_OK) == 0)
 		return (path);
-	return (0);	
+	return (0);
 }
 
 char	**ft_splitenvp(char **envp)
 {
-	char 	**str;
+	char	**str;
+	char	*denvp;
 	int		i;
 
 	i = 0;
 	str = 0;
+	denvp = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
 	if (envp[i] == 0)
-		str = ft_split("/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin", ':');
+		str = ft_split(denvp, ':');
 	else
 	{
 		while (envp[i] && ft_strnstr(envp[i], "PATH=", 5) == 0)
@@ -30,7 +44,7 @@ char	**ft_splitenvp(char **envp)
 
 char	*ft_getepath(char *cmd, char **envp)
 {
-	char 	**str;
+	char	**str;
 	char	*tmp;
 	char	*path;
 	int		i;
@@ -54,7 +68,7 @@ char	*ft_getepath(char *cmd, char **envp)
 	return (0);
 }
 
-int		ft_checkfile(char *str)
+int	ft_checkfile(char *str)
 {
 	int	i;
 
@@ -62,14 +76,7 @@ int		ft_checkfile(char *str)
 	while (str[i])
 	{
 		if (str[i] == '/')
-		{
-			// while (str[++ i])
-			// {
-			// 	if (str[i] != '/')
-					return (1);
-			// }
-			// return (2);
-		}
+			return (1);
 		i ++;
 	}
 	return (0);
@@ -84,19 +91,17 @@ char	*ft_getpath(char **cmds, char **envp, int err)
 	flag = ft_checkfile(cmds[0]);
 	if (flag == 1)
 		path = ft_getcpath(cmds[0]);
-	else if (flag == 0)	
+	if (flag == 0)
 		path = ft_getepath(cmds[0], envp);
 	if (path == 0)
 	{	
 		name = ft_strdup(cmds[0]);
-		// ft_free(cmds);
-		// free (path);
+		if (err > 0)
+			ft_free(cmds);
 		if (flag == 1)
 			ft_perror(&name, err);
-		// else if (flag == 2)	
-		// 	ft_errmsg(&name, "not a directory\n", err);
-		else	
-			ft_errmsg(&name, "command not found\n", err);	
+		else
+			ft_errmsg(&name, "command not found\n", err);
 	}
 	return (path);
 }

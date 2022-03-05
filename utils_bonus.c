@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fdonetta <fdonetta@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/05 19:38:08 by fdonetta          #+#    #+#             */
+/*   Updated: 2022/03/05 19:38:20 by fdonetta         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	ft_stdread(int fd, char *lim)
@@ -22,7 +34,7 @@ void	ft_bonus(int argc, char *lim)
 {
 	int		fd[2];
 	int		pid;
-	
+
 	if (argc < 6 && lim == 0)
 	{
 		write (2, "pipex: bad arguments\n", 22);

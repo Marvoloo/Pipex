@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   error.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fdonetta <fdonetta@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/05 19:25:50 by fdonetta          #+#    #+#             */
+/*   Updated: 2022/03/05 19:26:33 by fdonetta         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	ft_errmsg(char **name, char *str, int a)
@@ -17,7 +29,7 @@ void	ft_errmsg(char **name, char *str, int a)
 
 void	ft_perror(char **name, int a)
 {	
-	char *str;
+	char	*str;
 
 	str = ft_strjoin("pipex: ", *name);
 	free (*name);
