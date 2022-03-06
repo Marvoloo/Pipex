@@ -82,7 +82,7 @@ int	ft_checkfile(char *str)
 	return (0);
 }
 
-char	*ft_getpath(char **cmds, char **envp, int err)
+char	*ft_getpath(char **cmds, char **envp, int err, t_arg *arg)
 {
 	char	*path;
 	char	*name;
@@ -96,8 +96,8 @@ char	*ft_getpath(char **cmds, char **envp, int err)
 	if (path == 0)
 	{	
 		name = ft_strdup(cmds[0]);
-		if (err > 0)
-			ft_free(cmds);
+		free(arg);
+		ft_free(cmds);
 		if (flag == 1)
 			ft_perror(&name, err);
 		else

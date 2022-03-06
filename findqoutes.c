@@ -14,9 +14,6 @@
 
 int	ft_finddqoutes(char **str, char c, int *a, int *flag)
 {	
-	int	i;
-
-	i = *a;
 	while ((*str)[++ (*a)])
 	{
 		if ((*str)[(*a)] == c)

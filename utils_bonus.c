@@ -12,6 +12,21 @@
 
 #include "pipex.h"
 
+void	ft_closepipes(t_arg *arg, int current)
+{
+	int	i;
+
+	i = 0;
+	while (i < arg[0].size)
+	{
+		if (i != current - 1)
+			close(arg[i].fd[0]);
+		if (i != current)
+			close(arg[i].fd[1]);
+		i ++;
+	}
+}
+
 void	ft_stdread(int fd, char *lim)
 {
 	char	*line;
@@ -22,7 +37,7 @@ void	ft_stdread(int fd, char *lim)
 		{
 			free (line);
 			close(fd);
-			exit (0);
+			exit(0);
 		}
 		write(fd, line, ft_strlen(line));
 		write(fd, "\n", 1);
@@ -30,46 +45,50 @@ void	ft_stdread(int fd, char *lim)
 	}
 }
 
-void	ft_bonus(int argc, char *lim)
+void	ft_bonus(char *lim, t_arg *arg)
 {
-	int		fd[2];
-	int		pid;
-
-	if (argc < 6 && lim == 0)
+	arg[0].pid = ft_fork();
+	if (arg[0].pid == 0)
 	{
-		write (2, "pipex: bad arguments\n", 22);
-		exit (1);
-	}
-	ft_pipe(fd);
-	pid = ft_fork();
-	if (pid == 0)
-	{
-		close(fd[0]);
-		ft_stdread(fd[1], lim);
+		ft_closepipes(arg, 0);
+		ft_stdread(arg[0].fd[1], lim);
 	}
 	else
+		waitpid (arg[0].pid, 0, 0);
+}
+
+void	ft_initarg(t_arg **arg, int size)
+{
+	int	i;
+
+	i = 0;
+	*arg = malloc (sizeof(t_arg) * size);
+	if (!(*arg))
+		exit(1);
+	while (i < size)
 	{
-		wait (0);
-		close(fd[1]);
-		dup2(fd[0], 0);
-		close(fd[0]);
+		ft_pipe((*arg)[i].fd);
+		(*arg)[i].size = size;
+		i ++;
 	}
 }
 
-int	ft_check_heredoc(int argc, char **argv, int *out)
+int	ft_check_heredoc(int argc, char **argv, int *out, t_arg **arg)
 {
 	char	*name;
 
 	if (ft_strncmp(argv[1], "here_doc", 9) == 0)
-	{
+	{	
+		
 		*out = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0664);
 		if (*out < 0)
 		{
 			name = ft_strdup(argv[argc - 1]);
 			ft_perror(&name, 1);
 		}
-		ft_bonus(argc, argv[2]);
-		return (3);
+		ft_initarg(arg, argc - 3);
+		ft_bonus(argv[2], *arg);
+		return (2);
 	}
-	return (2);
+	return (1);
 }

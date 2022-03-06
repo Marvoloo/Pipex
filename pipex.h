@@ -23,21 +23,25 @@
 # include "libft/libft.h"
 # include "get_next_line.h"
 
-typedef struct s_pid {
+typedef struct s_arg {
 	int		pid;
-}	t_pid;
+	int		fd[2];
+	int		size;
+}	t_arg;
 
 int		ft_fork(void);
 void	ft_free(char **array);
 void	ft_pipe(int fd[2]);
 void	ft_perror(char **name, int a);
 void	ft_errmsg(char **name, char *str, int a);
-void	ft_process(char **cmds, char *path, char **envp);
-char	*ft_getpath(char **cmds, char **envp, int errno);
+void	ft_openfile(int *fd, int i, char *file);
+void	ft_process(char **cmds, char *path, char **envp, t_arg *arg);
+void	ft_initarg(t_arg **arg, int size);
+char	*ft_getpath(char **cmds, char **envp, int errno, t_arg *arg);
 char	**ft_check_cmds(char **cmds);
 char	**ft_join(char **str, int a, int b, int len);
 int		ft_remdqoutes(char **str, int *flag);
-
-int		ft_check_heredoc(int argc, char **argv, int *out);
+void	ft_closepipes(t_arg *arg, int current);
+int		ft_check_heredoc(int argc, char **argv, int *out, t_arg **arg);
 
 #endif

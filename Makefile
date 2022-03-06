@@ -31,7 +31,7 @@ LOBJS = $(LSRCS:%.c=%.o)
 
 all: $(NAME)
 
-bonus: fclean $(BNAME)
+bonus: $(BNAME)
 
 $(NAME): $(LIB) $(OBJS) $(HEADERS)
 	cc -Wall -Wextra -Werror $(OBJS) $(LIB) -o $(NAME)

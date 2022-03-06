@@ -47,20 +47,39 @@ void	ft_pipe(int fd[2])
 	}
 }
 
-void	ft_process(char **cmds, char *path, char **envp)
+void	ft_openfile(int *fd, int i, char *file)
 {
 	char	*name;
 
-	if (path == 0 || cmds[0] == 0)
+	if (i == 0)
 	{
-		ft_free(cmds);
-		free (path);
-		exit (127);
+		*fd = open(file, O_RDONLY, 0664);
+		if (*fd < 0)
+		{
+			name = ft_strdup(file);
+			ft_perror(&name, 0);
+		}
 	}
+	if (i == 1)
+	{
+		*fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0664);
+		if (*fd < 0)
+		{
+			name = ft_strdup(file);
+			ft_perror(&name, 1);
+		}
+	}
+}
+
+void	ft_process(char **cmds, char *path, char **envp, t_arg *arg)
+{
+	char	*name;
+
 	if (execve(path, cmds, envp) == -1)
 	{
 		ft_free(cmds);
 		free (path);
+		free (arg);
 		name = ft_strdup("execve");
 		ft_perror(&name, 1);
 	}

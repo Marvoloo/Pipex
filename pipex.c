@@ -12,72 +12,40 @@
 
 #include "pipex.h"
 
-void	ft_read(int in, char *argv, char **envp, int *fd)
+void	ft_read(int in, char *argv, char **envp, t_arg *pids)
 {
-	// int		fd[2];
 	char	*path;
 	char	**cmds;
-	int		pid;
 
-	// ft_pipe(fd);
 	if (in >= 0)
 	{	
-		cmds = ft_check_cmds(ft_split(argv, ' '));
-		path = ft_getpath(cmds, envp, 0);
-		pid = ft_fork();
-		if (pid == 0)
+		pids[0].pid = ft_fork();
+		if (pids[0].pid == 0)
 		{	
-			close(fd[0]);
+			close(pids[0].fd[0]);
 			dup2(in, 0);
-			dup2(fd[1], 1);
-			ft_process(cmds, path, envp);
+			dup2(pids[0].fd[1], 1);
+			cmds = ft_check_cmds(ft_split(argv, ' '));
+			path = ft_getpath(cmds, envp, 127, pids);
+			ft_process(cmds, path, envp, pids);
 		}
-		ft_free(cmds);
-		free(path);
 	}
-	// close(fd[0]);
-	// close(fd[1]);
-	// close(fd[1]);
-	// dup2(fd[0], 0);
-	// close(fd[0]);
 }
 
-void	ft_write(int out, char *argv, char **envp, int *fd)
+void	ft_write(int out, char *argv, char **envp, t_arg *pids)
 {
 	char	*path;
 	char	**cmds;
-	int		pid;
 	
-	cmds = ft_check_cmds(ft_split(argv, ' '));
-	path = ft_getpath(cmds, envp, 127);
-	pid = ft_fork();
-	if (pid == 0)
+	pids[1].pid = ft_fork();
+	if (pids[1].pid == 0)
 	{	
-		close(fd[1]); 
+		close(pids[0].fd[1]); 
 		dup2(out, 1);
-		dup2(fd[0], 0);
-		ft_process(cmds, path, envp);
-	}
-	ft_free(cmds);
-	free(path);
-	// close(fd[0]);
-	// close(fd[1]);
-}
-
-void	ft_openfile(int *fd, int i, char *file)
-{
-	char	*name;
-
-	if (i == 0)
-		*fd = open(file, O_RDONLY, 0664);
-	if (i == 1)
-	{
-		*fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-		if (*fd <= 0)
-		{
-			name = ft_strdup(file);
-			ft_perror(&name, 1);
-		}
+		dup2(pids[0].fd[0], 0);
+		cmds = ft_check_cmds(ft_split(argv, ' '));
+		path = ft_getpath(cmds, envp, 127, pids);
+		ft_process(cmds, path, envp, pids);
 	}
 }
 
@@ -85,36 +53,24 @@ int	main(int argc, char *argv[], char *envp[])
 {
 	int		in;
 	int		out;
-	char	*name;
-	int		fd[2];
+	t_arg	*pids; // change for static
+	int		flag;
 	
-	if (argc == 5)
-	{	
-		ft_openfile(&in, 0, argv[1]);
-		ft_openfile(&out, 1, argv[4]);
-		if (in < 0)
-		{	
-			name = ft_strdup(argv[1]);
-			ft_perror(&name, 0);
-		}
-		ft_pipe(fd);
-		ft_read(in, argv[2], envp, fd);
-		ft_write(out, argv[3], envp, fd);
-		close(fd[0]);
-		close(fd[1]);
-		waitpid(-1, 0, 0);
-		waitpid(-1, 0, 0);
-	}
-	else
-	{
-		write (2, "pipex: bad arguments\n", 22);
-		exit (127);
-	}
-	return (0);
+	if (argc != 5)
+		exit(1);
+	ft_openfile(&in, 0, argv[1]);
+	ft_openfile(&out, 1, argv[4]);
+	pids = (t_arg *) malloc (sizeof(t_arg) * 2);
+	if (!pids)
+		exit(1);
+	ft_pipe(pids[0].fd);
+	ft_read(in, argv[2], envp, pids);
+	ft_write(out, argv[3], envp, pids);
+	close(pids[0].fd[0]);
+	close(pids[0].fd[1]);
+	waitpid(pids[0].pid, 0, 0);
+	waitpid(pids[1].pid, &flag, 0);
+	free(pids);
+	return (WEXITSTATUS(flag));
 }
-
-// (p1 p2) p3 -> fork() if !pid -> ft_execute() else: while (argc-- -4)
- //															waitpid(pid, NULL, 0);
-
-
  
